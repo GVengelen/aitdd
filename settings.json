@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": ["git", "npm", "node", "cat", "ls", "mkdir", "rm", "chmod"]
+  },
+  "model": "claude-sonnet-4-6",
+  "editor": {
+    "acceptEdits": false,
+    "autoAccept": false
+  },
+  "context": {
+    "maxTokens": 200000,
+    "includeStructure": true,
+    "ignorePatterns": ["node_modules", ".git", "coverage", "dist", ".next"]
+  }
+}

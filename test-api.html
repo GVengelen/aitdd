@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>API Tester</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #222; padding: 24px; }
+    h1 { font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.82rem; color: #666; margin-bottom: 20px; }
+    .top-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .top-bar label { font-size: .82rem; color: #555; white-space: nowrap; }
+    .top-bar input { flex: 1; min-width: 180px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.88rem; }
+    .token-bar {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 20px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px;
+    }
+    .token-bar .token-label { font-size: .78rem; color: #555; white-space: nowrap; font-weight: 600; }
+    .token-val { flex: 1; font-size: .75rem; font-family: monospace; color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .token-val.empty { color: #9ca3af; font-style: italic; }
+    .token-bar button { padding: 4px 10px; font-size: .75rem; background: #ef4444; margin-top: 0; border-radius: 4px; }
+    .token-bar button:hover { background: #dc2626; }
+    .section-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #888; margin: 20px 0 10px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 8px; }
+    .card { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .card h2 { font-size: 0.92rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; letter-spacing: .04em; }
+    .get  { background: #dbeafe; color: #1d4ed8; }
+    .post { background: #dcfce7; color: #15803d; }
+    .put  { background: #fef9c3; color: #92400e; }
+    .del  { background: #fee2e2; color: #b91c1c; }
+    label { display: block; font-size: 0.8rem; color: #555; margin-bottom: 3px; margin-top: 8px; }
+    input[type=text], input[type=email], input[type=password] {
+      width: 100%; padding: 6px 10px; border: 1px solid #d1d5db;
+      border-radius: 6px; font-size: 0.88rem;
+    }
+    button {
+      margin-top: 12px; padding: 7px 14px; border: none; border-radius: 6px;
+      background: #3b82f6; color: #fff; font-size: 0.88rem; cursor: pointer; font-weight: 500;
+    }
+    button:hover { background: #2563eb; }
+    .res {
+      margin-top: 10px; padding: 8px 10px; border-radius: 6px; font-size: 0.8rem;
+      font-family: monospace; white-space: pre-wrap; word-break: break-all;
+      background: #f1f5f9; border: 1px solid #e2e8f0; min-height: 36px; max-height: 200px; overflow-y: auto;
+    }
+    .res.ok  { border-color: #86efac; background: #f0fdf4; color: #14532d; }
+    .res.err { border-color: #fca5a5; background: #fef2f2; color: #7f1d1d; }
+    .hint { font-size: .75rem; color: #9ca3af; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>API Tester</h1>
+  <p class="subtitle">Auth token is automatically stored after register / login and sent with all user requests.</p>
+
+  <div class="top-bar">
+    <label>Base URL</label>
+    <input id="base" value="http://localhost:3000/api" />
+  </div>
+
+  <div class="token-bar">
+    <span class="token-label">Token</span>
+    <span class="token-val empty" id="token-display">no token — register or login first</span>
+    <button onclick="clearToken()">Clear</button>
+  </div>
+
+  <!-- ── AUTH ─────────────────────────────────────────────────── -->
+  <div class="section-title">Auth</div>
+  <div class="cards">
+
+    <!-- REGISTER -->
+    <div class="card">
+      <h2><span class="badge post">POST</span> /auth/register</h2>
+      <label>Name</label>
+      <input type="text" id="reg-name" placeholder="Alice" />
+      <label>Email</label>
+      <input type="email" id="reg-email" placeholder="alice@example.com" />
+      <label>Password <span style="color:#9ca3af">(min 10 chars)</span></label>
+      <input type="password" id="reg-pass" placeholder="••••••••••" />
+      <button onclick="authReq('POST','/auth/register',{name:v('reg-name'),email:v('reg-email'),password:v('reg-pass')},'res-reg')">Send</button>
+      <p class="hint">Token is auto-stored on success.</p>
+      <div class="res" id="res-reg"></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="card">
+      <h2><span class="badge post">POST</span> /auth/login</h2>
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="alice@example.com" />
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••••" />
+      <button onclick="authReq('POST','/auth/login',{email:v('login-email'),password:v('login-pass')},'res-login')">Send</button>
+      <p class="hint">Token is auto-stored on success.</p>
+      <div class="res" id="res-login"></div>
+    </div>
+
+    <!-- ME -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> /auth/me</h2>
+      <button onclick="req('GET','/auth/me',null,'res-me')">Send</button>
+      <div class="res" id="res-me"></div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="card">
+      <h2><span class="badge post">POST</span> /auth/logout</h2>
+      <button onclick="logoutReq()">Send</button>
+      <p class="hint">Token is cleared on success.</p>
+      <div class="res" id="res-logout"></div>
+    </div>
+
+  </div>
+
+  <!-- ── USERS ─────────────────────────────────────────────────── -->
+  <div class="section-title">Users <span style="font-weight:400;text-transform:none;letter-spacing:0">(requires token)</span></div>
+  <div class="cards">
+
+    <!-- LIST -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> /users — list all</h2>
+      <button onclick="req('GET','/users',null,'res-list')">Send</button>
+      <div class="res" id="res-list"></div>
+    </div>
+
+    <!-- GET BY ID -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> /users/:id</h2>
+      <label>ID</label>
+      <input type="text" id="get-id" placeholder="user-id" />
+      <button onclick="req('GET','/users/'+v('get-id'),null,'res-get')">Send</button>
+      <div class="res" id="res-get"></div>
+    </div>
+
+    <!-- UPDATE -->
+    <div class="card">
+      <h2><span class="badge put">PUT</span> /users/:id — update</h2>
+      <label>ID</label>
+      <input type="text" id="update-id" placeholder="user-id" />
+      <label>Name (optional)</label>
+      <input type="text" id="update-name" placeholder="New name" />
+      <label>Email (optional)</label>
+      <input type="email" id="update-email" placeholder="new@example.com" />
+      <button onclick="sendUpdate()">Send</button>
+      <div class="res" id="res-update"></div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="card">
+      <h2><span class="badge del">DELETE</span> /users/:id</h2>
+      <label>ID</label>
+      <input type="text" id="delete-id" placeholder="user-id" />
+      <button onclick="req('DELETE','/users/'+v('delete-id'),null,'res-delete')">Send</button>
+      <div class="res" id="res-delete"></div>
+    </div>
+
+    <!-- HEALTH -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> /health</h2>
+      <button onclick="req('GET','/health',null,'res-health')">Send</button>
+      <div class="res" id="res-health"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const base = () => document.getElementById('base').value.replace(/\/$/, '');
+    const v = id => document.getElementById(id).value.trim();
+
+    let token = '';
+
+    function setToken(t) {
+      token = t;
+      const el = document.getElementById('token-display');
+      if (t) {
+        el.textContent = t.length > 60 ? t.slice(0, 60) + '…' : t;
+        el.className = 'token-val';
+      } else {
+        el.textContent = 'no token — register or login first';
+        el.className = 'token-val empty';
+      }
+    }
+
+    function clearToken() { setToken(''); }
+
+    function buildHeaders(withBody) {
+      const h = {};
+      if (withBody) h['Content-Type'] = 'application/json';
+      if (token) h['Authorization'] = 'Bearer ' + token;
+      return h;
+    }
+
+    async function req(method, path, body, resId) {
+      const el = document.getElementById(resId);
+      el.className = 'res';
+      el.textContent = '…';
+      try {
+        const opts = { method, headers: buildHeaders(!!body) };
+        if (body) opts.body = JSON.stringify(body);
+        const r = await fetch(base() + path, opts);
+        const text = await r.text();
+        let pretty = text;
+        try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+        el.textContent = `${r.status} ${r.statusText}\n\n${pretty}`;
+        el.className = r.ok ? 'res ok' : 'res err';
+      } catch (e) {
+        el.textContent = `Network error: ${e.message}`;
+        el.className = 'res err';
+      }
+    }
+
+    async function authReq(method, path, body, resId) {
+      const el = document.getElementById(resId);
+      el.className = 'res';
+      el.textContent = '…';
+      try {
+        const opts = { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+        const r = await fetch(base() + path, opts);
+        const text = await r.text();
+        let data, pretty = text;
+        try { data = JSON.parse(text); pretty = JSON.stringify(data, null, 2); } catch {}
+        el.textContent = `${r.status} ${r.statusText}\n\n${pretty}`;
+        el.className = r.ok ? 'res ok' : 'res err';
+        if (r.ok && data && data.token) setToken(data.token);
+      } catch (e) {
+        el.textContent = `Network error: ${e.message}`;
+        el.className = 'res err';
+      }
+    }
+
+    async function logoutReq() {
+      const el = document.getElementById('res-logout');
+      el.className = 'res';
+      el.textContent = '…';
+      try {
+        const r = await fetch(base() + '/auth/logout', { method: 'POST', headers: buildHeaders(false) });
+        const text = await r.text();
+        let pretty = text;
+        try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+        el.textContent = `${r.status} ${r.statusText}\n\n${pretty}`;
+        el.className = r.ok ? 'res ok' : 'res err';
+        if (r.ok) clearToken();
+      } catch (e) {
+        el.textContent = `Network error: ${e.message}`;
+        el.className = 'res err';
+      }
+    }
+
+    function sendUpdate() {
+      const body = {};
+      const name = v('update-name');
+      const email = v('update-email');
+      if (name) body.name = name;
+      if (email) body.email = email;
+      req('PUT', '/users/' + v('update-id'), body, 'res-update');
+    }
+  </script>
+</body>
+</html>

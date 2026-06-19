@@ -1,0 +1,51 @@
+{
+  "name": "tdd-workshop-project",
+  "version": "1.0.0",
+  "description": "Test-Driven Development Workshop with Claude Code Agents",
+  "main": "dist/src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx --env-file=.env src/index.ts",
+    "start": "node --env-file=.env dist/src/index.js",
+    "build": "tsc",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:coverage:report": "vitest run --coverage && open coverage/lcov-report/index.html",
+    "test:mutation": "stryker run"
+  },
+  "keywords": [
+    "tdd",
+    "testing",
+    "claude",
+    "agents"
+  ],
+  "author": "Your Workshop",
+  "license": "MIT",
+  "devDependencies": {
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/typescript-checker": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.9.3",
+    "@vitest/coverage-v8": "^4.1.9",
+    "prisma": "^7.8.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.5",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "hono": "^4.12.26",
+    "jose": "^6.2.3",
+    "zod": "^4.4.3"
+  }
+}

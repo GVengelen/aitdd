@@ -1,0 +1,58 @@
+PROJECT CONTEXT - Read This File First
+
+== REPOSITORY STRUCTURE ==
+
+features/          Feature specifications (Markdown)
+tests/             Test files (Vitest)
+  ├── unit/        Unit tests (one per module)
+  └── integration/ Integration tests (workflows)
+src/               Implementation code (matches tests/)
+.claude/           Configuration & documentation
+  ├── index.md     Full repository index (READ THIS)
+  ├── architecture.md  Data flow & patterns
+  ├── skills.md    Custom command definitions
+  └── context.txt  This file
+scripts/           Automation scripts
+
+== CONVENTIONS ==
+
+Feature file:     features/<feature-name>.md
+Test file:        tests/test-<feature-name>.js
+Code file:        src/<feature-name>.js
+
+Testing:          Vitest (JavaScript)
+Pattern:          Tests verify requirements → Code passes tests
+
+== IMPORTANT FOR TOKEN OPTIMIZATION ==
+
+✅ Read .claude/index.md first - it documents everything
+✅ Read .claude/architecture.md for data flow and patterns
+✅ Don't explore with ls/find - use the index files instead
+✅ Assume structure exists as documented in index.md
+
+== KEY WORKFLOW ==
+
+Phase 1: /tdd-feature-to-tests <name>
+  └─ Reads: features/<name>.md
+  └─ Generates: tests/test-<name>.js
+
+Phase 2: /tdd-tests-to-code <test-file>
+  └─ Reads: tests/<test-file>
+  └─ Generates: src/<module>.js
+
+== REFERENCE ==
+
+For detailed info: See .claude/index.md
+For data flow:     See .claude/architecture.md
+For commands:      See .claude/skills.md
+For full setup:    See ../../README.md
+
+== QUICK FACTS ==
+
+- Test files import from src/
+- Code is minimal (passes tests only)
+- Features flow: Spec → Tests → Code → Commit
+- Use /tdd-* commands, not manual editing
+- Tests define the contract
+
+NO FILE EXPLORATION NEEDED - Everything is documented above.

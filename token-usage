@@ -1,0 +1,11 @@
+Here's the breakdown for the full session:
+
+Metric Tokens
+API calls 207
+Input (non-cached) 281
+Cache reads 17,010,793
+Cache writes 1,353,191
+Output 235,326
+The "input tokens: 281" is correct — almost all input was served from cache (prompt caching kicks in aggressively in long sessions as the context window grows). The total context sent across all API calls was ~18.4M tokens, but ~93% was cache reads (billed at 90% discount).
+
+Estimated cost: ~$13.71 at Sonnet 4.6 list prices — though your actual price may differ depending on plan/credits.
